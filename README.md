@@ -60,6 +60,7 @@ Dont forget to add ```NSBluetoothAlwaysUsageDescription``` in Info.plist
 | `stopAdvertising()`                         | Stop BLE advertising                                  |
 | `send(_ data: Data)`                         | Send a notification to all subscribed centrals        |
 | `onSubscribed: ((CBPeripheralManager) -> Void)?` | Closure called when the first central subscribes      |
+| `onDisconnect: ((CBPeripheralManager) -> Void)?` | Closure called when the first peripheral disconnects      |
 
 
 ## Contributing
