@@ -12,7 +12,7 @@ import Foundation
 
 /// Errors that can be thrown or reported by BLESim.
 public enum BLESimError: Error, LocalizedError {
-    case invalidUUID(String)
+    case invalidServiceId(String)
     case unauthorized(String)
     case bluetoothUnavailable
     case advertisingFailed(String)
@@ -20,8 +20,8 @@ public enum BLESimError: Error, LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .invalidUUID(let s):
-                    return "Invalid UUID string: \(s)"
+        case .invalidServiceId(let s):
+                    return "Invalid service Id: \(s)"
         case .unauthorized(let s):
                     return "Unathorised: \(s)"
         case .bluetoothUnavailable:
