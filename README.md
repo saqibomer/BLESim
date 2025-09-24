@@ -29,23 +29,28 @@ dependencies: [
 ```bash
 import BLESim
 
-let simDevice = BLESim(configuration: BLESim.Configuration(
-            serviceUUID: UUID().uuidString,
-            characteristicUUID: UUID().uuidString,
-            localName: "Testing Device",
-            logsEnabled: true
+    do {
+        let config = try BLESim.Configuration(
+            serviceUUID: "A3B2C1D0-EF12-3456-7890-ABCDEF012345",
+            characteristicUUID: "180D"
         )
-    )
-simDevice.startAdvertising()
+        let bleSim = BLESim(configuration: config)
+        bleSim.startAdvertising()
+        bleSim.startAdvertising()
+    } catch {
+        print("Configuration error: \(error.localizedDescription)")
+        throw error
+    }
+
 
 // Send any data to subscribed centrals
 let payload = Data("Hello BLE".utf8)
-simDevice.send(payload)
-
+bleSim.send(payload)
+// Call back when peripheral is connected
 bleSim.onSubscribed = { peripheral in
     print("Central subscribed to \(peripheral)")
 }
-                
+// Call back when peripheral is disconnected                
 bleSim.onDisconnect = { peripheral in
     print("Central subscribed to \(peripheral)")
 }

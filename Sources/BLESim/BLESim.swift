@@ -13,11 +13,21 @@ public final class BLESim: NSObject {
         public let characteristicUUID: CBUUID
         public let localName: String
         public let logsEnabled: Bool
-        
+
         public init(serviceUUID: String,
                     characteristicUUID: String,
                     localName: String = "BLESim",
-                    logsEnabled: Bool = false) {
+                    logsEnabled: Bool = false) throws
+        {
+            // Validate first using Foundation's UUID initializer
+            guard UUID(uuidString: serviceUUID) != nil || serviceUUID.count == 4 else {
+                throw BLESimError.invalidUUID(serviceUUID)
+            }
+            guard UUID(uuidString: characteristicUUID) != nil || characteristicUUID.count == 4 else {
+                throw BLESimError.invalidUUID(characteristicUUID)
+            }
+
+            // Safe to create CBUUID now
             self.serviceUUID = CBUUID(string: serviceUUID)
             self.characteristicUUID = CBUUID(string: characteristicUUID)
             self.localName = localName
@@ -28,6 +38,7 @@ public final class BLESim: NSObject {
     // MARK: - Public
     public var onSubscribed: ((_ peripheral: CBPeripheralManager) -> Void)?
     public var onDisconnect: ((_ peripheral: CBPeripheralManager) -> Void)?
+    public var onError: ((BLESimError) -> Void)?
     public private(set) var isAdvertising: Bool = false
     
     // MARK: - Private
@@ -44,8 +55,24 @@ public final class BLESim: NSObject {
     
     // MARK: - Public API
     public func startAdvertising() {
-        guard manager.state == .poweredOn else { return }
-        start()
+        
+        switch manager.state {
+        case .unknown:
+            onError?(.bluetoothUnavailable)
+        case .resetting:
+            return
+        case .unsupported:
+            onError?(.bluetoothUnavailable)
+        case .unauthorized:
+            onError?(.unauthorized("Permission to access bluetooht not granted"))
+        case .poweredOff:
+            onError?(.notPoweredOn)
+        case .poweredOn:
+            start()
+        default:
+            return
+        }
+        
     }
     
     public func stopAdvertising() {
