@@ -41,11 +41,13 @@ simDevice.startAdvertising()
 // Send any data to subscribed centrals
 let payload = Data("Hello BLE".utf8)
 simDevice.send(payload)
-simDevice.onSubscribed {
 
+bleSim.onSubscribed = { peripheral in
+    print("Central subscribed to \(peripheral)")
 }
-simDevice.onDisconnect {
-
+                
+bleSim.onDisconnect = { peripheral in
+    print("Central subscribed to \(peripheral)")
 }
 ```
 
