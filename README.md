@@ -29,22 +29,22 @@ dependencies: [
 ```bash
 import BLESim
 
-let peripheral = BLESim(configuration: BLESim.Configuration(
+let simDevice = BLESim(configuration: BLESim.Configuration(
             serviceUUID: UUID().uuidString,
             characteristicUUID: UUID().uuidString,
             localName: "Testing Device",
             logsEnabled: true
         )
     )
-peripheral.startAdvertising()
+simDevice.startAdvertising()
 
 // Send any data to subscribed centrals
 let payload = Data("Hello BLE".utf8)
-peripheral.send(payload)
-peripheral.onSubscribed {
+simDevice.send(payload)
+simDevice.onSubscribed {
 
 }
-peripheral.onDisconnect {
+simDevice.onDisconnect {
 
 }
 ```
