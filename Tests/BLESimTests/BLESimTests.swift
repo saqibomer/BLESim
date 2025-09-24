@@ -1,6 +1,13 @@
 import Testing
+import Foundation
 @testable import BLESim
 
-@Test func example() async throws {
-    // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+@Test func testInitialisation() async throws {
+    let sim = BLESim(configuration: BLESim.Configuration(
+            serviceUUID: UUID().uuidString,
+            characteristicUUID: UUID().uuidString,
+            localName: "Testing Device",
+            logsEnabled: true
+        )
+    )
 }
