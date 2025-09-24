@@ -16,9 +16,7 @@ Easily broadcast any binary payload as BLE characteristic notifications—perfec
 
 ### Swift Package Manager (SPM)
 1. In Xcode: `File ▸ Add Packages…`
-2. ADD ```
-https://github.com/saqibomer/BLESim)
-```
+2. ADD ```https://github.com/saqibomer/BLESim)```
 3. Add **BLESim** to your target.
    Or in a `Package.swift`:
 ```swift
