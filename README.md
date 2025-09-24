@@ -1,12 +1,12 @@
 # BLESim
 
-A lightweight Swift package to **simulate a Bluetooth Low Energy (BLE) peripheral** on **iOS** or **macOS**.  
+A lightweight Swift package to **simulate a Bluetooth Low Energy (BLE) peripheral** on **iOS**.  
 Easily broadcast any binary payload as BLE characteristic notifications—perfect for prototyping or testing without dedicated hardware.
 
 ---
 
 ## Features
-- **Cross-platform**: iOS & macOS (CoreBluetooth).
+- **Platform**: iOS.
 - **Generic Data**: Send any `Data` object (JSON, binary structs, strings…).
 - **Drop-in Ready**: Add via Swift Package Manager and start advertising in minutes.
 
