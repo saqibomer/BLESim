@@ -41,18 +41,26 @@ peripheral.startAdvertising()
 // Send any data to subscribed centrals
 let payload = Data("Hello BLE".utf8)
 peripheral.send(payload)
+peripheral.onSubscribed {
+
+}
+peripheral.onDisconnect {
+
+}
 ```
 
 Dont forget to add ```NSBluetoothAlwaysUsageDescription``` in Info.plist
 
 ## API Overview
-| Method / Property      | Description                                     |
-| ---------------------- | ----------------------------------------------- |
-| `init(configuration:)` | Custom UUIDs, local name and logs setting       |
-| `startAdvertising()`   | Starts BLE advertising.                         |
-| `stopAdvertising()`    | Stops advertising.                              |
-| `send(_ data: Data)`   | Sends a notification to subscribed centrals.    |
-| `isAdvertising`        | Bool indicating advertising status.             |
+
+| Method / Property                          | Description                                           |
+|---------------------------------------------|-------------------------------------------------------|
+| `init(configuration:)`                      | Initialize with custom UUIDs, local name, and logging |
+| `startAdvertising()`                        | Start BLE advertising                                 |
+| `stopAdvertising()`                         | Stop BLE advertising                                  |
+| `send(_ data: Data)`                         | Send a notification to all subscribed centrals        |
+| `onSubscribed: ((CBPeripheralManager) -> Void)?` | Closure called when the first central subscribes      |
+
 
 ## Contributing
 Pull requests, issues, and feature suggestions are welcome!
