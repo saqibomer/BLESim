@@ -54,6 +54,10 @@ bleSim.onSubscribed = { peripheral in
 bleSim.onDisconnect = { peripheral in
     print("Central subscribed to \(peripheral)")
 }
+// Call back for errors  
+bleSim.onError = { error in
+    print("Errpr \(error.localisedDescription)")
+}
 ```
 
 Dont forget to add ```NSBluetoothAlwaysUsageDescription``` in Info.plist
@@ -68,6 +72,7 @@ Dont forget to add ```NSBluetoothAlwaysUsageDescription``` in Info.plist
 | `send(_ data: Data)`                         | Send a notification to all subscribed centrals        |
 | `onSubscribed: ((CBPeripheralManager) -> Void)?` | Closure called when the first central subscribes      |
 | `onDisconnect: ((CBPeripheralManager) -> Void)?` | Closure called when the first peripheral disconnects      |
+| `onError: ((BLESimError) -> Void)?` | Closure called on errors      |
 
 
 ## Contributing
