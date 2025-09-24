@@ -14,22 +14,22 @@ public final class BLESim: NSObject {
         public let localName: String
         public let logsEnabled: Bool
 
-        public init(serviceUUID: String,
-                    characteristicUUID: String,
+        public init(serviceId: String,
+                    characteristicId: String,
                     localName: String = "BLESim",
                     logsEnabled: Bool = false) throws
         {
             // Validate first using Foundation's UUID initializer
-            guard UUID(uuidString: serviceUUID) != nil || serviceUUID.count == 4 else {
-                throw BLESimError.invalidUUID(serviceUUID)
+            guard UUID(uuidString: serviceId) != nil || serviceId.count == 4 else {
+                throw BLESimError.invalidUUID(serviceId)
             }
-            guard UUID(uuidString: characteristicUUID) != nil || characteristicUUID.count == 4 else {
-                throw BLESimError.invalidUUID(characteristicUUID)
+            guard UUID(uuidString: characteristicId) != nil || characteristicId.count == 4 else {
+                throw BLESimError.invalidUUID(characteristicId)
             }
 
             // Safe to create CBUUID now
-            self.serviceId = CBUUID(string: serviceUUID)
-            self.characteristicId = CBUUID(string: characteristicUUID)
+            self.serviceId = CBUUID(string: serviceId)
+            self.characteristicId = CBUUID(string: characteristicId)
             self.localName = localName
             self.logsEnabled = logsEnabled
         }
