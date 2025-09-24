@@ -13,7 +13,7 @@ public final class BLESim: NSObject {
         public let characteristicId: CBUUID
         public let localName: String
         public let logsEnabled: Bool
-
+        
         public init(serviceId: String,
                     characteristicId: String,
                     localName: String = "BLESim",
@@ -26,7 +26,7 @@ public final class BLESim: NSObject {
             guard UUID(uuidString: characteristicId) != nil || characteristicId.count == 4 else {
                 throw BLESimError.invalidCharcId(characteristicId)
             }
-
+            
             // Safe to create CBUUID now
             self.serviceId = CBUUID(string: serviceId)
             self.characteristicId = CBUUID(string: characteristicId)
@@ -38,6 +38,7 @@ public final class BLESim: NSObject {
     // MARK: - Public
     public var onSubscribed: ((_ peripheral: CBPeripheralManager) -> Void)?
     public var onDisconnect: ((_ peripheral: CBPeripheralManager) -> Void)?
+    public var onStatusChange: ((_ status: BLESimStatus) -> Void)?
     public var onError: ((BLESimError) -> Void)?
     public private(set) var isAdvertising: Bool = false
     
@@ -55,33 +56,30 @@ public final class BLESim: NSObject {
     
     // MARK: - Public API
     public func startAdvertising() {
-        
         switch manager.state {
-        case .unknown:
-            onError?(.bluetoothUnavailable)
-            return
-        case .resetting:
-            return
+        case .unknown, .resetting:
+            onStatusChange?(.initializing)
         case .unsupported:
+            onStatusChange?(.unavailable)
             onError?(.bluetoothUnavailable)
-            return
         case .unauthorized:
-            onError?(.unauthorized("Permission to access bluetooht not granted"))
-            return
+            onStatusChange?(.unauthorized)
+            onError?(.unauthorized("Permission to access Bluetooth not granted"))
         case .poweredOff:
+            onStatusChange?(.poweredOff)
             onError?(.notPoweredOn)
-            return
         case .poweredOn:
+            onStatusChange?(.advertising)
             start()
-        default:
-            return
+        @unknown default:
+            onStatusChange?(.stopped)
         }
-        
     }
     
     public func stopAdvertising() {
         manager.stopAdvertising()
         isAdvertising = false
+        onStatusChange?(.stopped)
         if config.logsEnabled { print("[BLESim] Advertising stopped") }
     }
     
@@ -110,6 +108,7 @@ public final class BLESim: NSObject {
             CBAdvertisementDataLocalNameKey: config.localName
         ])
         isAdvertising = true
+        onStatusChange?(.advertising)
         if config.logsEnabled { print("[BLESim] Advertising started as \(config.localName)") }
     }
 }
@@ -122,18 +121,20 @@ extension BLESim: CBPeripheralManagerDelegate {
             start()
         }
     }
-
+    
     public func peripheralManager(_ peripheral: CBPeripheralManager,
                                   central: CBCentral,
                                   didSubscribeTo characteristic: CBCharacteristic) {
         onSubscribed?(peripheral)
+        onStatusChange?(.subscribed)
         if config.logsEnabled { print("[BLESim] Central subscribed: \(central.identifier)") }
     }
-
+    
     public func peripheralManager(_ peripheral: CBPeripheralManager,
                                   central: CBCentral,
                                   didUnsubscribeFrom characteristic: CBCharacteristic) {
         onDisconnect?(peripheral)
+        onStatusChange?(.advertising)
         if config.logsEnabled { print("[BLESim] Central unsubscribed: \(central.identifier)") }
     }
 }

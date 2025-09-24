@@ -58,6 +58,13 @@ bleSim.onDisconnect = { peripheral in
 bleSim.onError = { error in
     print("Errpr \(error.localisedDescription)")
 }
+// Called when central's status changes  
+bleSim.onStatusChange = { [weak self] status in
+    DispatchQueue.main.async {
+        print("Status changed to \(status)")
+        self?.bleStatus = status
+    }
+}
 ```
 
 Dont forget to add ```NSBluetoothAlwaysUsageDescription``` in Info.plist
@@ -72,7 +79,9 @@ Dont forget to add ```NSBluetoothAlwaysUsageDescription``` in Info.plist
 | `send(_ data: Data)`                         | Send a notification to all subscribed centrals        |
 | `onSubscribed: ((CBPeripheralManager) -> Void)?` | Closure called when the first central subscribes      |
 | `onDisconnect: ((CBPeripheralManager) -> Void)?` | Closure called when the first peripheral disconnects      |
+| `onStatusChange: ((BLESimStatus) -> Void)?` | Closure called when status changes      |
 | `onError: ((BLESimError) -> Void)?` | Closure called on errors      |
+
 
 
 ## Contributing
