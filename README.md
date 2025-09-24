@@ -31,8 +31,8 @@ import BLESim
 
     do {
         let config = try BLESim.Configuration(
-            serviceUUID: "A3B2C1D0-EF12-3456-7890-ABCDEF012345",
-            characteristicUUID: "180D"
+            serviceId: "A3B2C1D0-EF12-3456-7890-ABCDEF012345",
+            characteristicId: "180D"
         )
         let bleSim = BLESim(configuration: config)
         bleSim.startAdvertising()
@@ -62,7 +62,7 @@ Dont forget to add ```NSBluetoothAlwaysUsageDescription``` in Info.plist
 
 | Method / Property                          | Description                                           |
 |---------------------------------------------|-------------------------------------------------------|
-| `init(configuration:)`                      | Initialize with custom UUIDs, local name, and logging |
+| `init(configuration:)`                      | Initialize with custom ids, local name, and logging |
 | `startAdvertising()`                        | Start BLE advertising                                 |
 | `stopAdvertising()`                         | Stop BLE advertising                                  |
 | `send(_ data: Data)`                         | Send a notification to all subscribed centrals        |

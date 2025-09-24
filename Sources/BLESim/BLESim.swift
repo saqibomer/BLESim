@@ -9,8 +9,8 @@ public final class BLESim: NSObject {
     
     // MARK: - Configuration
     public struct Configuration {
-        public let serviceUUID: CBUUID
-        public let characteristicUUID: CBUUID
+        public let serviceId: CBUUID
+        public let characteristicId: CBUUID
         public let localName: String
         public let logsEnabled: Bool
 
@@ -28,8 +28,8 @@ public final class BLESim: NSObject {
             }
 
             // Safe to create CBUUID now
-            self.serviceUUID = CBUUID(string: serviceUUID)
-            self.characteristicUUID = CBUUID(string: characteristicUUID)
+            self.serviceId = CBUUID(string: serviceUUID)
+            self.characteristicId = CBUUID(string: characteristicUUID)
             self.localName = localName
             self.logsEnabled = logsEnabled
         }
@@ -92,9 +92,9 @@ public final class BLESim: NSObject {
     
     // MARK: - Private
     private func start() {
-        let service = CBMutableService(type: config.serviceUUID, primary: true)
+        let service = CBMutableService(type: config.serviceId, primary: true)
         characteristic = CBMutableCharacteristic(
-            type: config.characteristicUUID,
+            type: config.characteristicId,
             properties: [.notify],
             value: nil,
             permissions: []
@@ -102,7 +102,7 @@ public final class BLESim: NSObject {
         service.characteristics = [characteristic]
         manager.add(service)
         manager.startAdvertising([
-            CBAdvertisementDataServiceUUIDsKey: [config.serviceUUID],
+            CBAdvertisementDataServiceUUIDsKey: [config.serviceId],
             CBAdvertisementDataLocalNameKey: config.localName
         ])
         isAdvertising = true
