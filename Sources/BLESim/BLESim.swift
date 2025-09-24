@@ -21,10 +21,10 @@ public final class BLESim: NSObject {
         {
             // Validate first using Foundation's UUID initializer
             guard UUID(uuidString: serviceId) != nil || serviceId.count == 4 else {
-                throw BLESimError.invalidUUID(serviceId)
+                throw BLESimError.invalidServiceId(serviceId)
             }
             guard UUID(uuidString: characteristicId) != nil || characteristicId.count == 4 else {
-                throw BLESimError.invalidUUID(characteristicId)
+                throw BLESimError.invalidCharcId(characteristicId)
             }
 
             // Safe to create CBUUID now
