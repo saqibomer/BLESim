@@ -59,14 +59,18 @@ public final class BLESim: NSObject {
         switch manager.state {
         case .unknown:
             onError?(.bluetoothUnavailable)
+            return
         case .resetting:
             return
         case .unsupported:
             onError?(.bluetoothUnavailable)
+            return
         case .unauthorized:
             onError?(.unauthorized("Permission to access bluetooht not granted"))
+            return
         case .poweredOff:
             onError?(.notPoweredOn)
+            return
         case .poweredOn:
             start()
         default:
