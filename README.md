@@ -65,6 +65,12 @@ bleSim.onStatusChange = { [weak self] status in
         self?.bleStatus = status
     }
 }
+// Called when data is writen to BLE 
+bleSim.onWrite = { [weak self] _, data in
+    self?.handleWrite(data)
+}
+
+    
 ```
 
 Dont forget to add ```NSBluetoothAlwaysUsageDescription``` in Info.plist
@@ -81,6 +87,7 @@ Dont forget to add ```NSBluetoothAlwaysUsageDescription``` in Info.plist
 | `onDisconnect: ((CBPeripheralManager) -> Void)?` | Closure called when the first peripheral disconnects      |
 | `onStatusChange: ((BLESimStatus) -> Void)?` | Closure called when status changes      |
 | `onError: ((BLESimError) -> Void)?` | Closure called on errors      |
+| `onWrite: ((Data) -> Void)?` | Called when data is writen to BLE       |
 
 
 

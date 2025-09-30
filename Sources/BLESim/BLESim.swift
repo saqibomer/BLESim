@@ -40,6 +40,7 @@ public final class BLESim: NSObject {
     public var onDisconnect: ((_ peripheral: CBPeripheralManager) -> Void)?
     public var onStatusChange: ((_ status: BLESimStatus) -> Void)?
     public var onError: ((BLESimError) -> Void)?
+    public var onWrite: ((_ data: Data) -> Void)?
     public private(set) var isAdvertising: Bool = false
     
     // MARK: - Private
@@ -97,9 +98,9 @@ public final class BLESim: NSObject {
         let service = CBMutableService(type: config.serviceId, primary: true)
         characteristic = CBMutableCharacteristic(
             type: config.characteristicId,
-            properties: [.notify],
+            properties: [.notify, .write],
             value: nil,
-            permissions: []
+            permissions: [.writeable]
         )
         service.characteristics = [characteristic]
         manager.add(service)
@@ -136,6 +137,16 @@ extension BLESim: CBPeripheralManagerDelegate {
         onDisconnect?(peripheral)
         onStatusChange?(.advertising)
         if config.logsEnabled { print("[BLESim] Central unsubscribed: \(central.identifier)") }
+    }
+    
+    public func peripheralManager(_ peripheral: CBPeripheralManager,
+                                  didReceiveWrite requests: [CBATTRequest]) {
+        for req in requests {
+            if let value = req.value {
+                onWrite?(value)
+            }
+            peripheral.respond(to: req, withResult: .success)
+        }
     }
 }
 
