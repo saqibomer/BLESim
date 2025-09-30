@@ -66,7 +66,7 @@ bleSim.onStatusChange = { [weak self] status in
     }
 }
 // Called when data is writen to BLE 
-bleSim.onWrite = { [weak self] _, data in
+bleSim.onWrite = { [weak self] data in
     self?.handleWrite(data)
 }
 
