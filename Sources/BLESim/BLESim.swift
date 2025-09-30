@@ -10,30 +10,34 @@ public final class BLESim: NSObject {
     // MARK: - Configuration
     public struct Configuration {
         public let serviceId: CBUUID
-        public let characteristicId: CBUUID
+        public let characteristicIds: [CBUUID]   // support multiple chars
         public let localName: String
         public let logsEnabled: Bool
         
         public init(serviceId: String,
-                    characteristicId: String,
+                    characteristicIds: [String],
                     localName: String = "BLESim",
-                    logsEnabled: Bool = false) throws
-        {
-            // Validate first using Foundation's UUID initializer
+                    logsEnabled: Bool = false) throws {
+            
             guard UUID(uuidString: serviceId) != nil || serviceId.count == 4 else {
                 throw BLESimError.invalidServiceId(serviceId)
             }
-            guard UUID(uuidString: characteristicId) != nil || characteristicId.count == 4 else {
-                throw BLESimError.invalidCharcId(characteristicId)
+            
+            var chars: [CBUUID] = []
+            for id in characteristicIds {
+                guard UUID(uuidString: id) != nil || id.count == 4 else {
+                    throw BLESimError.invalidCharcId(id)
+                }
+                chars.append(CBUUID(string: id))
             }
             
-            // Safe to create CBUUID now
             self.serviceId = CBUUID(string: serviceId)
-            self.characteristicId = CBUUID(string: characteristicId)
+            self.characteristicIds = chars
             self.localName = localName
             self.logsEnabled = logsEnabled
         }
     }
+
     
     // MARK: - Public
     public var onSubscribed: ((_ peripheral: CBPeripheralManager) -> Void)?
@@ -46,7 +50,7 @@ public final class BLESim: NSObject {
     // MARK: - Private
     private let config: Configuration
     private var manager: CBPeripheralManager!
-    private var characteristic: CBMutableCharacteristic!
+    private var characteristics: [CBUUID: CBMutableCharacteristic] = [:]
     
     // MARK: - Init
     public init(configuration: Configuration) {
@@ -86,32 +90,48 @@ public final class BLESim: NSObject {
     
     /// Send arbitrary data to all subscribed centrals.
     @discardableResult
-    public func send(_ data: Data) -> Bool {
-        guard let char = characteristic else { return false }
+    public func send(_ data: Data, to characteristicId: CBUUID) -> Bool {
+        guard let char = characteristics[characteristicId] else { return false }
         let ok = manager.updateValue(data, for: char, onSubscribedCentrals: nil)
-        if config.logsEnabled { print("[BLESim] Sent \(data.count) bytes: \(ok)") }
+        if config.logsEnabled {
+            print("[BLESim] Sent \(data.count) bytes to \(characteristicId.uuidString): \(ok)")
+        }
         return ok
     }
+
     
     // MARK: - Private
     private func start() {
         let service = CBMutableService(type: config.serviceId, primary: true)
-        characteristic = CBMutableCharacteristic(
-            type: config.characteristicId,
-            properties: [.notify, .write],
-            value: nil,
-            permissions: [.writeable]
-        )
-        service.characteristics = [characteristic]
+        
+        var chars: [CBMutableCharacteristic] = []
+        
+        for charId in config.characteristicIds {
+            let characteristic = CBMutableCharacteristic(
+                type: charId,
+                properties: [.notify, .write],
+                value: nil,
+                permissions: [.writeable]
+            )
+            chars.append(characteristic)
+            characteristics[charId] = characteristic
+        }
+        
+        service.characteristics = chars
         manager.add(service)
+        
         manager.startAdvertising([
             CBAdvertisementDataServiceUUIDsKey: [config.serviceId],
             CBAdvertisementDataLocalNameKey: config.localName
         ])
+        
         isAdvertising = true
         onStatusChange?(.advertising)
         if config.logsEnabled { print("[BLESim] Advertising started as \(config.localName)") }
     }
+
+
+
 }
 
 // MARK: - CBPeripheralManagerDelegate

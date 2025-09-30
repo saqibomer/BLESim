@@ -31,8 +31,13 @@ import BLESim
 
     do {
         let config = try BLESim.Configuration(
-            serviceId: "A3B2C1D0-EF12-3456-7890-ABCDEF012345",
-            characteristicId: "180D"
+            serviceId: serviceId,
+            characteristicIds: [
+                BLECharacteristic.counter.rawValue,
+                BLECharacteristic.batteryLevel.rawValue
+            ],
+            localName: deviceName,
+            logsEnabled: true
         )
         let bleSim = BLESim(configuration: config)
         bleSim.startAdvertising()
@@ -45,7 +50,7 @@ import BLESim
 
 // Send any data to subscribed centrals
 let payload = Data("Hello BLE".utf8)
-bleSim.send(payload)
+bleSim.send(payload, to: CBUUID(string: BLECharacteristic.batteryLevel.rawValue))
 // Call back when peripheral is connected
 bleSim.onSubscribed = { peripheral in
     print("Central subscribed to \(peripheral)")
