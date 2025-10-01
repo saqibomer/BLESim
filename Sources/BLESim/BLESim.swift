@@ -37,7 +37,7 @@ public final class BLESim: NSObject {
             self.logsEnabled = logsEnabled
         }
     }
-
+    
     
     // MARK: - Public
     public var onSubscribed: ((_ peripheral: CBPeripheralManager) -> Void)?
@@ -98,7 +98,7 @@ public final class BLESim: NSObject {
         }
         return ok
     }
-
+    
     
     // MARK: - Private
     private func start() {
@@ -129,9 +129,9 @@ public final class BLESim: NSObject {
         onStatusChange?(.advertising)
         if config.logsEnabled { print("[BLESim] Advertising started as \(config.localName)") }
     }
-
-
-
+    
+    
+    
 }
 
 // MARK: - CBPeripheralManagerDelegate
@@ -148,7 +148,7 @@ extension BLESim: CBPeripheralManagerDelegate {
                                   didSubscribeTo characteristic: CBCharacteristic) {
         onSubscribed?(peripheral)
         onStatusChange?(.subscribed)
-        if config.logsEnabled { print("[BLESim] Central subscribed: \(central.identifier)") }
+        if config.logsEnabled { print("[BLESim] Central subscribed to \(characteristic.uuid)") }
     }
     
     public func peripheralManager(_ peripheral: CBPeripheralManager,
@@ -164,9 +164,17 @@ extension BLESim: CBPeripheralManagerDelegate {
         for req in requests {
             if let value = req.value {
                 onWrite?(value)
+                if let char = characteristics[req.characteristic.uuid] {
+                    char.value = value
+                    manager.updateValue(value, for: char, onSubscribedCentrals: nil)
+                    if config.logsEnabled {
+                        print("[BLESim] Notified \(value as NSData) for \(req.characteristic.uuid)")
+                    }
+                }
             }
             peripheral.respond(to: req, withResult: .success)
         }
     }
+    
 }
 
